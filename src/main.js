@@ -5,74 +5,63 @@ import * as THREE from "three";
 ---------------------------- */
 const app = document.getElementById("app");
 
-document.documentElement.style.margin = "0";
-document.documentElement.style.padding = "0";
-document.documentElement.style.height = "100%";
-document.documentElement.style.overflow = "hidden";
-
-document.body.style.margin = "0";
-document.body.style.padding = "0";
-document.body.style.height = "100%";
-document.body.style.overflow = "hidden";
-
-app.style.width = "100vw";
-app.style.height = "100vh";
-app.style.margin = "0";
-app.style.padding = "0";
-
 /* ---------------------------
    UI
 ---------------------------- */
 app.innerHTML = `
-  <div id="ui" style="position:fixed; top:12px; left:12px; background:#111; color:#fff; padding:12px; border-radius:10px; font-family:system-ui; z-index:10; width:260px;">
-    <div style="font-weight:700; margin-bottom:8px;">Mini Satellite Orbit Sim</div>
+<button id="menuBtn">☰ Menu</button>
+<div id="uiOverlay"></div>
 
-    <label>Speed <span id="speedVal">1.0</span>x</label>
-    <input id="speed" type="range" min="0" max="5" step="0.1" value="1" style="width:100%;" />
-
-    <label style="display:block; margin-top:8px;">Altitude <span id="altVal">2.5</span></label>
-    <input id="alt" type="range" min="1.8" max="5.0" step="0.1" value="2.5" style="width:100%;" />
-
-    <button id="pause" style="margin-top:10px; width:100%; padding:8px; border-radius:8px; border:0; cursor:pointer;">Pause</button>
-
-    <button id="fail1" style="margin-top:10px; width:100%; padding:8px; border-radius:8px; border:0; cursor:pointer;">
-      Toggle Sat 1 State
-    </button>
-    <div id="state1" style="margin-top:6px; font-size:12px;">Sat 1: ACTIVE</div>
-
-    <button id="fail2" style="margin-top:10px; width:100%; padding:8px; border-radius:8px; border:0; cursor:pointer;">
-      Toggle Sat 2 State
-    </button>
-    <div id="state2" style="margin-top:6px; font-size:12px;">Sat 2: ACTIVE</div>
-
-    <button id="reset" style="margin-top:10px; width:100%; padding:8px; border-radius:8px; border:0; cursor:pointer;">
-      Reset Simulation
-    </button>
-
-    <div style="display:flex; gap:6px; margin-top:10px;">
-      <button class="ts" data-ts="0.5" style="flex:1; padding:8px; border-radius:8px; border:0; cursor:pointer;">0.5x</button>
-      <button class="ts" data-ts="1"   style="flex:1; padding:8px; border-radius:8px; border:0; cursor:pointer;">1x</button>
-      <button class="ts" data-ts="2"   style="flex:1; padding:8px; border-radius:8px; border:0; cursor:pointer;">2x</button>
-      <button class="ts" data-ts="5"   style="flex:1; padding:8px; border-radius:8px; border:0; cursor:pointer;">5x</button>
-    </div>
-
-    <div id="contact1" style="margin-top:10px; font-size:12px;">Sat 1 Contact: --</div>
-    <div id="contact2" style="margin-top:4px; font-size:12px;">Sat 2 Contact: --</div>
-    <div id="isl" style="margin-top:8px; font-size:12px;">ISL: --</div>
-    <div id="coverage" style="margin-top:4px; font-size:12px;">Coverage (30s): --</div>
-
-    <div style="margin-top:10px; opacity:0.8; font-size:12px;">
-      Tip: drag canvas to rotate, scroll canvas to zoom
-    </div>
+<div id="ui">
+  <div id="uiTopRow" style="display:none;">
+    <div style="font-weight:700; flex:1;">Mini Satellite Orbit Sim</div>
+    <button id="closeMenu" style="padding:8px 10px; border-radius:10px; border:0; cursor:pointer;">✕</button>
   </div>
+
+  <div style="font-weight:700; margin-bottom:8px;" class="desktopTitle">Mini Satellite Orbit Sim</div>
+
+  <label>Speed <span id="speedVal">1.0</span>x</label>
+  <input id="speed" type="range" min="0" max="5" step="0.1" value="1" style="width:100%;" />
+
+  <label style="display:block; margin-top:8px;">Altitude <span id="altVal">2.5</span></label>
+  <input id="alt" type="range" min="1.8" max="5.0" step="0.1" value="2.5" style="width:100%;" />
+
+  <button id="pause" style="margin-top:10px; width:100%; padding:8px; border-radius:8px; border:0; cursor:pointer;">Pause</button>
+
+  <button id="fail1" style="margin-top:10px; width:100%; padding:8px; border-radius:8px; border:0; cursor:pointer;">Toggle Sat 1 State</button>
+  <div id="state1" style="margin-top:6px; font-size:12px;">Sat 1: ACTIVE</div>
+
+  <button id="fail2" style="margin-top:10px; width:100%; padding:8px; border-radius:8px; border:0; cursor:pointer;">Toggle Sat 2 State</button>
+  <div id="state2" style="margin-top:6px; font-size:12px;">Sat 2: ACTIVE</div>
+
+  <button id="reset" style="margin-top:10px; width:100%; padding:8px; border-radius:8px; border:0; cursor:pointer;">Reset Simulation</button>
+
+  <div style="display:flex; gap:6px; margin-top:10px;">
+    <button class="ts" data-ts="0.5" style="flex:1; padding:8px; border-radius:8px; border:0; cursor:pointer;">0.5x</button>
+    <button class="ts" data-ts="1"   style="flex:1; padding:8px; border-radius:8px; border:0; cursor:pointer;">1x</button>
+    <button class="ts" data-ts="2"   style="flex:1; padding:8px; border-radius:8px; border:0; cursor:pointer;">2x</button>
+    <button class="ts" data-ts="5"   style="flex:1; padding:8px; border-radius:8px; border:0; cursor:pointer;">5x</button>
+  </div>
+
+  <div id="contact1" style="margin-top:10px; font-size:12px;">Sat 1 Contact: --</div>
+  <div id="contact2" style="margin-top:4px; font-size:12px;">Sat 2 Contact: --</div>
+  <div id="isl" style="margin-top:8px; font-size:12px;">ISL: --</div>
+  <div id="coverage" style="margin-top:4px; font-size:12px;">Network Coverage (30s): --</div>
+
+  <div style="margin-top:10px; opacity:0.8; font-size:12px;">
+    Tip: drag canvas to rotate, scroll canvas to zoom
+  </div>
+</div>
+
 
   <canvas id="c" style="display:block; width:100vw; height:100vh;"></canvas>
 `;
 
 const ui = document.getElementById("ui");
-["mousedown", "mousemove", "mouseup", "wheel", "pointerdown"].forEach((evt) => {
-  ui.addEventListener(evt, (e) => e.stopPropagation());
+["mousedown", "mousemove", "mouseup", "wheel", "pointerdown", "touchstart", "touchmove"].forEach(evt => {
+  ui.addEventListener(evt, e => e.stopPropagation(), { passive: false });
 });
+
 
 const canvas = document.getElementById("c");
 const speedSlider = document.getElementById("speed");
@@ -86,6 +75,57 @@ const islEl = document.getElementById("isl");
 const coverageEl = document.getElementById("coverage");
 const state1El = document.getElementById("state1");
 const state2El = document.getElementById("state2");
+
+const menuBtn = document.getElementById("menuBtn");
+const uiOverlay = document.getElementById("uiOverlay");
+const closeMenuBtn = document.getElementById("closeMenu");
+const uiTopRow = document.getElementById("uiTopRow");
+
+const mq = window.matchMedia("(max-width: 640px)");
+
+function openMenu() {
+  if (!mq.matches) return;
+  ui.classList.add("open");
+  uiOverlay.classList.add("show");
+  menuBtn.classList.add("hidden"); // hide button when open
+}
+
+function closeMenu() {
+  ui.classList.remove("open");
+  uiOverlay.classList.remove("show");
+  // show menu button only on mobile
+  if (mq.matches) menuBtn.classList.remove("hidden");
+}
+
+function syncResponsiveUI() {
+  if (mq.matches) {
+    // mobile mode
+    if (uiTopRow) uiTopRow.style.display = "flex";
+    // if drawer isn't open, ensure menu button is visible
+    if (!ui.classList.contains("open")) menuBtn.classList.remove("hidden");
+  } else {
+    // desktop mode
+    if (uiTopRow) uiTopRow.style.display = "none";
+    // ensure overlay isn't blocking and drawer isn't in "mobile open" state
+    ui.classList.remove("open");
+    uiOverlay.classList.remove("show");
+    // hide the menu button on desktop
+    menuBtn.classList.add("hidden");
+  }
+}
+
+menuBtn.addEventListener("click", openMenu);
+uiOverlay.addEventListener("click", closeMenu);
+if (closeMenuBtn) closeMenuBtn.addEventListener("click", closeMenu);
+
+// IMPORTANT: listen to breakpoint changes (better than resize alone)
+mq.addEventListener("change", syncResponsiveUI);
+// resize is still fine as a backup (devtools sometimes behaves oddly)
+window.addEventListener("resize", syncResponsiveUI);
+
+syncResponsiveUI();
+
+
 
 /* ---------------------------
    Simulation enums + helpers
